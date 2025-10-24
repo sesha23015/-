@@ -1,0 +1,42 @@
+from abc import abstractmethod
+
+# Базовые классы - определяют основные типы персонажей
+class BaseCharacter:
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
+# Миксины - добавляют конкретные способности
+class MixinSpeakable:
+    def speaking(self) -> str:
+        return "Что-то говорит"
+
+class MixinAnimated:
+    def is_animated(self) -> bool:
+        return True
+
+class MixinFunny:
+    def makes_laugh(self) -> str:
+        return "хахахаха"
+
+# Основные персонажи
+class Shrek(BaseCharacter, MixinSpeakable, MixinAnimated, MixinFunny):
+    def get_name(self):
+        return 'Shrek'
+    
+    def speaking(self):
+        return '2 просьбы: заткни ротик!'
+
+class Donkey(BaseCharacter, MixinSpeakable, MixinAnimated, MixinFunny):
+    def get_name(self):
+        return 'Donkey'
+    
+    def speaking(self):
+        return 'мы уже приехали?'
+
+if __name__ == "__main__":
+    shrek = Shrek()
+    print(f"Имя: {shrek.get_name()}")
+    print(f"Речь: {shrek.speaking()}")
+    print(f"Анимированный: {shrek.is_animated()}")
+    print(f"Смех: {shrek.makes_laugh()}")
