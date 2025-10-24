@@ -1,0 +1,81 @@
+import random
+import time
+
+# Класс для создания "жуков" (игроков)
+class Beetle:
+    def __init__(self, name, health=100):
+        self.name = name
+        self.health = health
+        self.max_health = health
+    
+    def attack(self, enemy):
+        # Атака случайным уроном
+        damage = random.randint(1, 20)
+        enemy.health -= damage
+        print(f"{self.name} атакует {enemy.name} и наносит {damage} урона!")
+        
+        # Проверка на смерть врага
+        if enemy.health <= 0:
+            print(f"{enemy.name} погиб!")
+            self.health = min(self.health + 10, self.max_health)  # Лечение за убийство
+            return True  # Враг умер
+        return False  # Враг выжил
+    
+    def __str__(self):
+        return f"{self.name} ({self.health} HP)"
+
+# Класс для армии жуков
+class Army:
+    def __init__(self, name, size=5):
+        self.name = name
+        self.beetles = [Beetle(f"{name}-{i+1}") for i in range(size)]
+    
+    def attack_enemy(self, enemy_army):
+        if not self.beetles or not enemy_army.beetles:
+            return
+            
+        # Выбираем случайных бойцов
+        attacker = random.choice(self.beetles)
+        defender = random.choice(enemy_army.beetles)
+        
+        print(f"\n{attacker.name} из армии '{self.name}' атакует {defender.name} из армии '{enemy_army.name}'")
+        
+        # Проводим атаку
+        if attacker.attack(defender):
+            enemy_army.beetles.remove(defender)  # Убираем мертвого жука
+    
+    def has_survivors(self):
+        return len(self.beetles) > 0
+
+# Основная игра
+if __name__ == "__main__":
+    print("=== БИТВА АРМИЙ ЖУКОВ ===")
+    
+    # Создаем армии
+    army1 = Army("Красные", 3)
+    army2 = Army("Синие", 3)
+    
+    print(f"\nАрмия 1: {army1.name} ({len(army1.beetles)} бойцов)")
+    print(f"Армия 2: {army2.name} ({len(army2.beetles)} бойцов)")
+    
+    round_num = 1
+    
+    # Главный игровой цикл
+    while army1.has_survivors() and army2.has_survivors():
+        print(f"\n--- Раунд {round_num} ---")
+        
+        # Армии атакуют по очереди
+        army1.attack_enemy(army2)
+        if not army2.has_survivors():
+            print(f"\n Армия '{army1.name}' ПОБЕДИЛА!")
+            break
+            
+        army2.attack_enemy(army1)
+        if not army1.has_survivors():
+            print(f"\n Армия '{army2.name}' ПОБЕДИЛА!")
+            break
+            
+        round_num += 1
+        time.sleep(1)  # Пауза между раундами
+    
+    print("\nИгра окончена!")
