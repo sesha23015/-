@@ -1,0 +1,19 @@
+a = int(input('a = '))
+b = int(input('b = '))
+i = 1
+x = int((a + b) // 2)
+
+while abs(i) != 2:
+  q = 'ваше число больше ' +  str(x) + '?'
+  print(q)
+  q2 = input('да/нет\n')
+  if q2 == 'да':
+    a = x
+    x = (a + b) // 2
+    i = a - b
+  if q2 == 'нет':
+    b = x
+    x = (a + b) // 2
+    i = a - b
+else:
+  print('ваше число = ' + str(x))
