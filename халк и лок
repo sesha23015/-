@@ -1,0 +1,24 @@
+q: str = input('Хочет сниматься в кино? да / нет \n')
+
+if q == ('да' or 'Да'):
+    q2 = input('Халк или Локи?\n')
+    if q2 == ('Халк' ) and ('халк'):
+        q3 = int(input('Скока бицуха, брат?\n'))
+        if q3 < 60:
+            q4 = input('Пошел отсюда')
+        if q3 >= 60:
+            print('Ты принят, брат')
+        else:
+            print('no no no mister fish')
+    elif q2 == 'Локи':
+        q3 = input('Кого люишь? маму или папу?\n')
+        if q3 == ('маму' and 'Маму'):
+            print('Иди к папе и спроси, кого больше любит из вас?')
+        if q3 == ('папу' and 'Папу'):
+            print('Пошел домой быстро')
+        else:
+            print('no no no mister fish')
+    else:
+        print('no no no mister fish')
+else:
+    print('Пока')
