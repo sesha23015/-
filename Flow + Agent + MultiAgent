@@ -1,0 +1,35 @@
+from agno.agent import Agent
+from agno.models.openai import OpenAILike
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.workflow import Workflow
+from agno.db.sqlite import SqliteDb
+from agno.knowledge.knowledge import Knowledge
+from dotenv import load_dotenv
+import os
+load_dotenv()
+True
+model = OpenAILike(
+    id="Qwen/Qwen3-Next-80B-A3B-Instruct",
+    name="Foundation Model",
+    provider="cloud.ru",
+    supports_native_structured_outputs=False,
+    base_url=os.getenv("DATABASE_URL"),
+    api_key = os.getenv("API_KEY"),
+)
+
+poiskovik = Agent(
+    model=model,
+    tools=[DuckDuckGoTools()],
+    instructions=(
+        "Ты - агент, который ищет ответ на вопрос пользователя через браузер DuckDuckGo."
+        "Используй исключительно инструменты DuckDuckGo для поиска информации."
+        "Используй только русский язык в ответах."
+    ),
+    markdown=True,
+)
+workflow = Workflow(
+    name="workflow_duckduckgo",
+    steps=[poiskovik]
+)
+
+result = workflow.print_response("расскажи об массовом убийстве граждан Африки", stream=True)
