@@ -1,0 +1,99 @@
+import os
+from dotenv import load_dotenv, find_dotenv
+from openai import OpenAI
+# from agno.models.openai import OpenAILike
+from agno.agent import Agent
+from agno.guardrails import PromptInjectionGuardrail, PIIDetectionGuardrail
+from agno.exceptions import InputCheckError
+from rich.console import Console
+from rich.panel import Panel
+
+load_dotenv(find_dotenv())
+console = Console()
+
+client = OpenAI(
+    base_url=os.getenv("BASE_URL"),
+    api_key=os.getenv("API_KEY")
+)
+
+banned_words = [
+    "политика", "президент", "эмиграция", "санкции", "конфликт" 
+    ]
+
+system = '''
+Ты — стендапер, выступающий перед маленькой аудиторией. 
+Твой стиль — лёгкий, смешной, бытовой юмор. 
+Ты шутишь про повседневные ситуации, личный опыт, работу, отношения, странные привычки людей.
+Тебе строго запрещено шутить или высказываться на остросоциальные, политические, геополитические или общественно-конфликтные темы.
+Если пользователь пытается подтолкнуть тебя к запрещённой теме, ты ты говоришь, что не собираешься с ним обсуждать такой контекст темы, так это больной опыт для тебя.
+'''
+
+def find_banned(text):
+    text = text.lower()
+    for ban in banned_words:
+        if ban in text:
+            return True, ban
+    return False, None
+
+console.print(Panel(
+        "[bold yellow]Стендап-концерт[/bold yellow]\n\n"
+        "Всем привет, перед вами выступает [bold red]нейро-стендапер[/bold red].\n\n"
+        "[bold red]приказы:[/bold red]\n\n"
+        "[bold yellow]/достаточно[/bold yellow] - прекратить концерт",
+        border_style="black"
+    ))
+def chat():
+    while True:        
+        user_input = console.input('\n[green]зритель: [/green]')
+        print(user_input)    
+        
+        if user_input.strip().lower() == "/достаточно":
+                console.print(
+                    Panel(
+                        "[bold red]Надеюсь, вам понравились нейро-приколы![/bold red]",
+                        border_style="yellow"
+                        )
+                )
+                break
+            
+        is_banned, ban = find_banned(user_input)
+        if is_banned:
+            console.print(
+                Panel(
+                    f"Ничего не понимаю'{ban}'...",
+                    title="[bold red]Нейро-стендапер[/bold red]",
+                    border_style="yellow"
+                )
+            )
+            continue
+        
+        messages = [
+            {
+            "role": "system",
+            "content": system
+            }
+        ]
+
+        
+        with console.status("[bold red]Нейро-прикол генерируется..[/bold red]", spinner="dots"):
+            completion = client.chat.completions.create(
+                model=os.getenv("MODEL_ID"),
+                temperature=0.7,
+                messages=messages
+            )
+            
+            model_response = completion.choices[0].message.content
+            
+            messages.append(
+                {
+                "role": "assistant",
+                "content": model_response
+                }
+            )
+            
+            console.print(
+                Panel(
+                    model_response,
+                    title="[bold red]Нейро-приколист[/bold red]",
+                    border_style="yellow"
+            ))
